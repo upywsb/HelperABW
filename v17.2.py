@@ -25,25 +25,25 @@ class ProBotApp:
         self.root = root
         self.root.title("ABW-helper v17.2")
         self.root.geometry("420x380")
-        
+
         self.config_file = 'config_roi.json'
         self.running = False
         self.roi_mob = None
         self.roi_self = None
         self.cooldowns = {}
-        
+
         # Zmienne współdzielone między zakładkami
         self.val_mob = tk.StringVar(value="MOB: 0%")
         self.val_hp = tk.StringVar(value="HP: 0%")
         self.val_mp = tk.StringVar(value="MP: 0%")
         self.val_cp = tk.StringVar(value="CP: 0%")
-        
+
         # Inicjalizacja UI (Zakładki pobierane z plików w lib/)
         self.tabs = ttk.Notebook(self.root)
         self.tab1 = MainTab(self.tabs, self)
         self.tab2 = CombatTab(self.tabs, self)
         self.tab3 = HealTab(self.tabs, self)
-        
+
         self.tabs.add(self.tab1, text='ROI & Profile')
         self.tabs.add(self.tab2, text='Walka (Skille)')
         self.tabs.add(self.tab3, text='Auto-Leczenie')
@@ -51,7 +51,7 @@ class ProBotApp:
 
         # Wczytanie ostatniego profilu
         self.load_profile(auto=True)
-        
+
         # Uruchomienie nasłuchiwania klawiszy w tle
         threading.Thread(target=self.keyboard_listener, daemon=True).start()
 
@@ -67,12 +67,12 @@ class ProBotApp:
 
     def save_profile(self, auto=False):
         data = {
-            "roi_m": self.roi_mob, 
-            "roi_s": self.roi_self, 
+            "roi_m": self.roi_mob,
+            "roi_s": self.roi_self,
             "target": self.target_key.get(),
-            "hp_lim": self.hp_limit.get(), 
+            "hp_lim": self.hp_limit.get(),
             "hp_key": self.hp_pot_key.get(),
-            "mp_lim": self.mp_limit.get(), 
+            "mp_lim": self.mp_limit.get(),
             "mp_key": self.mp_pot_key.get(),
             "skills": [{"act": a["active"].get(), "min": a["min"].get(), "max": a["max"].get(), "k": a["key"].get(), "r": a["reuse"].get()} for a in self.actions]
         }
@@ -122,12 +122,12 @@ class ProBotApp:
             if keyboard.is_pressed('alt+k'):
                 self.root.after(0, self.trigger_calibration)
                 time.sleep(1) # Delay, żeby nie wywołać kilka razy na raz
-            
+
             # Sprawdzanie Alt + R (Start/Stop)
             if keyboard.is_pressed('alt+r'):
                 self.root.after(0, self.toggle_bot)
                 time.sleep(1) # Delay, żeby nie wywołać kilka razy na raz
-                
+
             time.sleep(0.1)
 
     def toggle_bot(self):
@@ -150,13 +150,29 @@ class ProBotApp:
                     f_m = cv2.cvtColor(np.array(sct.grab(self.roi_mob)), cv2.COLOR_BGRA2BGR)
                     f_s = cv2.cvtColor(np.array(sct.grab(self.roi_self)), cv2.COLOR_BGRA2BGR)
                     h3 = f_s.shape[0] // 3
-                    
+                    # --- DEBUG: Zapisywanie wycinków do plików ---
+                    # Wycinamy fragmenty
+                    f_cp = f_s[2 : h3-2, :]
+                    f_hp = f_s[h3+2 : 2*h3-2, :]
+                    f_mp = f_s[2*h3+2 : -2, :]
+                    # Możesz to zakomentować, gdy już wszystko ustawisz
+                    cv2.imwrite("debug_cp.png", f_cp)
+                    cv2.imwrite("debug_hp.png", f_hp)
+                    cv2.imwrite("debug_mp.png", f_mp)
+                    # ---------------------------------------------
                     # 2. Analiza (Zawsze aktywna - Live Monitoring)
+                    # Dodajemy marginesy, żeby odciąć czarne ramki pasków
                     v_m = analizuj_hp_moba_smart(f_m, FILTRY["MOB"])
-                    v_h = analizuj_procent(f_s[h3:2*h3, :], FILTRY["HP"])
-                    v_mp = analizuj_procent(f_s[2*h3:, :], FILTRY["MP"])
-                    v_c = analizuj_procent(f_s[0:h3, :], FILTRY["CP"])
-                    
+
+                    # [0:h3] to CP - odcinamy 2px z góry i dołu
+                    v_c = analizuj_procent(f_s[2 : h3-2, :], FILTRY["CP"])
+
+                    # [h3:2*h3] to HP - odcinamy 2px od granic wycinka
+                    v_h = analizuj_procent(f_s[h3+2 : 2*h3-2, :], FILTRY["HP"])
+
+                    # [2*h3:] to MP - odcinamy 2px z góry wycinka
+                    v_mp = analizuj_procent(f_s[2*h3+2 : -2, :], FILTRY["MP"])
+
                     # Aktualizacja UI
                     self.val_mob.set(f"MOB: {v_m:.0f}%")
                     self.val_hp.set(f"HP: {v_h:.0f}%")
@@ -168,7 +184,7 @@ class ProBotApp:
                     # 3. Logika Leczenia (Tylko jeśli zaznaczone)
                     if self.use_hp_pot.get() and v_h < float(self.hp_limit.get()):
                         # Losowe opóźnienie PRZED kliknięciem (reakcja)
-                        time.sleep(random.uniform(0.02, 0.3)) 
+                        time.sleep(random.uniform(0.02, 0.3))
                         pydirectinput.press(self.hp_pot_key.get())
                         self.write_log(f"KLIK: {self.hp_pot_key.get()} (Leczenie)")
 
@@ -198,10 +214,10 @@ class ProBotApp:
                                         self.write_log(f"KLIK: {a['key'].get()} (Skill)")
                                         self.cooldowns[i] = now
                                         break
-                                        
+
                 except Exception as e:
                     print(f"Błąd silnika: {e}")
-                
+
                 time.sleep(0.1)
 
 if __name__ == "__main__":

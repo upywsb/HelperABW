@@ -1,0 +1,90 @@
+[
+    {
+        "slot_id": 1,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 233,
+        "anchor_y": 340
+    },
+    {
+        "slot_id": 2,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 227,
+        "anchor_y": 397
+    },
+    {
+        "slot_id": 3,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 226,
+        "anchor_y": 449
+    },
+    {
+        "slot_id": 4,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 0.0,
+        "anchor_y": 0.0
+    },
+    {
+        "slot_id": 5,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 0.0,
+        "anchor_y": 0.0
+    },
+    {
+        "slot_id": 6,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 0.0,
+        "anchor_y": 0.0
+    },
+    {
+        "slot_id": 7,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 0.0,
+        "anchor_y": 0.0
+    },
+    {
+        "slot_id": 8,
+        "is_active": true,
+        "hp_min": 0,
+        "hp_max": 40,
+        "key_bind": "",
+        "cooldown": 1.0,
+        "last_used": 0,
+        "anchor_x": 0.0,
+        "anchor_y": 0.0
+    }
+]
